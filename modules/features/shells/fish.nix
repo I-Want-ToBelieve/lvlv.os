@@ -35,6 +35,7 @@ in {
         du = "dust";
         ps = "procs";
       };
+      shellAliases.m = "mkdir -p";
       functions = {
         c = {
           description = "Open a path, or the current directory, in VS Code";

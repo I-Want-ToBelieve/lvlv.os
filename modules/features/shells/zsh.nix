@@ -120,7 +120,11 @@
       ];
 
       # The aliases every shell shares are in the shell-env feature.
-      shellAliases.fcd = ''cd "$(find . -type d | ${fzf})"'';
+      shellAliases = {
+        fcd = ''cd "$(find . -type d | ${fzf})"'';
+        # Not shared: nushell's mkdir already creates parents and rejects -p.
+        m = "mkdir -p";
+      };
 
       # zsh-vi-mode otherwise sets its key bindings on the first prompt, after atuin's,
       # and takes Ctrl-R back.

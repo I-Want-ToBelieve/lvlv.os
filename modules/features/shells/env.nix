@@ -18,11 +18,10 @@
       "go/bin"
     ];
 
-    # Aliases for fish, zsh and nushell alike, so each is one plain command line. Aliases
-    # that need a particular shell's syntax stay in that shell's feature.
+    # Aliases for fish, zsh and nushell alike, so each must be a command line that nushell
+    # also accepts. Aliases that need a particular shell's syntax stay in that shell's feature.
     home.shellAliases = {
       g = "git";
-      m = "mkdir -p";
       # Python's built-in file server for the current directory.
       serve = "${lib.getExe pkgs.python3} -m http.server";
       # ouch picks the format from the file, so one command covers every archive.

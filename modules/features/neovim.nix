@@ -2,11 +2,14 @@
 # and stylix gives it the colour scheme. Neovim's own defaults already map K (hover),
 # grn (rename), gra (code action), grr (references) and [d / ]d (diagnostics).
 {inputs, ...}: {
-  flake.modules.homeManager.neovim = {
+  flake.modules.homeManager.neovim = {pkgs, ...}: {
     imports = [inputs.nixvim.homeModules.nixvim];
 
     programs.nixvim = {
       enable = true;
+      # The flake's nixpkgs, which nixvim's own input follows; set here because nixvim
+      # warns when that follows changes its default without being stated.
+      nixpkgs.source = inputs.nixpkgs;
       # $EDITOR, also run as vi and vim.
       defaultEditor = true;
       viAlias = true;
@@ -55,6 +58,33 @@
         oil.enable = true;
         treesitter = {
           enable = true;
+          # The languages in use here, not all few hundred grammars.
+          grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+            bash
+            c
+            css
+            diff
+            dockerfile
+            fish
+            gitcommit
+            html
+            javascript
+            json
+            lua
+            markdown
+            markdown_inline
+            nix
+            python
+            query
+            regex
+            rust
+            toml
+            tsx
+            typescript
+            vim
+            vimdoc
+            yaml
+          ];
           settings = {
             highlight.enable = true;
             indent.enable = true;
