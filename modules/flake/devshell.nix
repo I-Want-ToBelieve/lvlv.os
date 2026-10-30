@@ -38,6 +38,9 @@ in {
       ];
 
       shellHook = ''
+        # sops looks under ~/Library/Application Support on macOS; one place on both systems.
+        export SOPS_AGE_KEY_FILE=''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}
+
         link_skills() {
           local dir=$1 link target name
           mkdir -p "$dir"

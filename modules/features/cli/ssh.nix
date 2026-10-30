@@ -9,13 +9,18 @@
       enableDefaultConfig = false;
       # Each name opens a `Host` block; values use OpenSSH's own directive names.
       settings = let
-        withKey = file: {
-          IdentityFile = "~/.ssh/${file}";
+        # Keys are tried in order: the ed25519 key, then the RSA key it replaces, until the
+        # new public key is registered with the service and the old one can be removed.
+        withKeys = files: {
+          IdentityFile = map (file: "~/.ssh/${file}") files;
+          # Only these keys, not every key in the agent: GitHub logs in as the account of the
+          # first key it accepts, which would pick the work account for github.com-personal.
+          IdentitiesOnly = "yes";
           PreferredAuthentications = "publickey";
         };
         # GitHub's SSH endpoint on port 443, for networks that block port 22.
-        githubWith = file:
-          withKey file
+        githubWith = files:
+          withKeys files
           // {
             HostName = "ssh.github.com";
             Port = 443;
@@ -37,12 +42,12 @@
           # Passphrases kept in the macOS Keychain; Linux's OpenSSH rejects this option.
           // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {UseKeychain = "yes";};
         # GitLab running on this machine.
-        "127.0.0.1" = withKey "id_rsa_gitlab_localhost" // {Port = 10022;};
-        "gitlab.com" = withKey "id_rsa_gitlab";
-        "gitlab.maodouling.com" = withKey "id_rsa" // {Port = 2224;};
-        "github.com" = githubWith "github_id_rsa";
-        "github.com-personal" = githubWith "github_personal_id_rsa";
-        "gitee.com" = withKey "gitee_id_rsa";
+        "127.0.0.1" = withKeys ["id_rsa_gitlab_localhost"] // {Port = 10022;};
+        "gitlab.com" = withKeys ["gitlab_id_ed25519" "id_rsa_gitlab"];
+        "gitlab.maodouling.com" = withKeys ["id_ed25519" "id_rsa"] // {Port = 2224;};
+        "github.com" = githubWith ["github_id_ed25519" "github_id_rsa"];
+        "github.com-personal" = githubWith ["github_personal_id_ed25519"];
+        "gitee.com" = withKeys ["gitee_id_ed25519" "gitee_id_rsa"];
         "001macos".HostName = "192.168.192.140";
       };
     };

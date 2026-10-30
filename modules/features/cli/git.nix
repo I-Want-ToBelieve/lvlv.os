@@ -88,6 +88,29 @@
       extensions = [pkgs.gh-dash];
     };
 
+    # Personal repositories commit as the GitHub account behind github.com-personal: those
+    # under ~/git.workspace/personal, and any whose remote is that account's.
+    programs.git.includes = let
+      personal = {
+        user = {
+          name = "itboy";
+          email = "24669431+I-Want-ToBelieve@users.noreply.github.com";
+        };
+      };
+      remote = url: {
+        condition = "hasconfig:remote.*.url:${url}";
+        contents = personal;
+      };
+    in [
+      {
+        condition = "gitdir:~/git.workspace/personal/";
+        contents = personal;
+      }
+      (remote "git@github.com-personal:**/**")
+      (remote "git@github.com:I-Want-ToBelieve/**")
+      (remote "https://github.com/I-Want-ToBelieve/**")
+    ];
+
     programs.delta = {
       enable = true;
       enableGitIntegration = true;
