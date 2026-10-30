@@ -1,5 +1,6 @@
 {
   flake.modules.homeManager.git = {
+    config,
     lib,
     pkgs,
     ...
@@ -67,9 +68,13 @@
       enable = true;
       enableGitIntegration = true;
       options = {
-        syntax-theme = "Nord";
+        # bat's base16 theme draws with the terminal's 16 colours, which stylix sets.
+        syntax-theme = "base16";
         line-numbers = true;
-        map-styles = "bold purple => syntax #8839ef, bold cyan => syntax #1e66f5";
+        # Moved lines keep their syntax colours over the theme's highlight backgrounds.
+        map-styles = lib.mkIf (config.lib ? stylix) (
+          with config.lib.stylix.colors.withHashtag; "bold purple => syntax ${base03}, bold cyan => syntax ${base02}"
+        );
       };
     };
   };

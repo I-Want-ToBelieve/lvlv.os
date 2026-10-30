@@ -13,6 +13,5 @@
     "proxychains"
     "fish"
     "zsh"
-    "neovim"
   ];
 }

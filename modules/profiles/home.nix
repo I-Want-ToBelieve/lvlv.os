@@ -11,6 +11,8 @@
       "nix-index"
       "nix-tools"
       "cli-tools"
+      "dev-tools"
+      "neovim"
       "nushell"
     ];
     desktop = [

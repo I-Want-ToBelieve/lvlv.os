@@ -1,4 +1,4 @@
-# Tiling windows: yabai, keys from skhd, borders around windows and yakite layouts.
+# Tiling windows: yabai, keys from skhd, JankyBorders around windows and yakite layouts.
 let
   yakite = "yakite action";
 in {
@@ -11,9 +11,14 @@ in {
         mouse_follows_focus = "off";
       };
       extraConfig = ''
-        borders active_color=0xff6eff89 inactive_color=0xff516468 width=12.0 2>/dev/null 1>&2 &
         yakite-daemon 2>/dev/null 1>&2 &
       '';
+    };
+
+    # A launchd agent; stylix sets the active and inactive colours.
+    services.jankyborders = {
+      enable = true;
+      width = 12.0;
     };
 
     services.skhd = {
@@ -65,12 +70,8 @@ in {
     };
 
     homebrew = {
-      taps = [
-        "FelixKratz/formulae"
-        "I-Want-ToBelieve/homebrew-formulae"
-      ];
+      taps = ["I-Want-ToBelieve/homebrew-formulae"];
       brews = [
-        "borders"
         "yakite"
         "yakite-toast"
       ];

@@ -25,13 +25,7 @@
         ${lib.getExe pkgs.krabby} random
         echo -e "\033[37m\033[0m"
       '';
-      shellAliases = {
-        ls = "eza --sort type";
-        l = "ls -la";
-        lt = "ls --tree";
-        ra = "yazi";
-        g = "git";
-      };
+      shellAliases.g = "git";
       functions.c = {
         description = "Open a path, or the current directory, in VS Code";
         argumentNames = "path_string";

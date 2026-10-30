@@ -1,4 +1,4 @@
-# proxychains-ng through the local v2rayA proxy: `proxy <command>`.
+# proxychains-ng through a local proxy, SOCKS5 on 20170 and HTTP on 20171: `proxy <command>`.
 {
   flake.modules.darwin.proxychains = {
     homebrew.brews = ["proxychains-ng"];

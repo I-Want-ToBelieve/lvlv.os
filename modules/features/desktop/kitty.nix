@@ -6,8 +6,15 @@
   }: {
     programs.kitty = {
       enable = true;
-      # Font, colours and background opacity come from stylix.
+      # Font, colours (tab bar included) and background opacity come from stylix.
       settings = {
+        # Tab bar
+        tab_bar_style = "fade";
+        tab_bar_edge = "bottom";
+        tab_title_template = "{index}: {title}";
+        bell_on_tab = "yes";
+        active_tab_font_style = "bold-italic";
+        inactive_tab_font_style = "bold";
         # Window
         inactive_text_alpha = "1.0";
         window_padding_width = "12 24 0 24";
@@ -99,6 +106,8 @@
           "ctrl+shift+equal" = "increase_font_size";
           "ctrl+shift+minus" = "decrease_font_size";
           "ctrl+shift+backspace" = "restore_font_size";
+          # Search the scrollback with fzf and copy the chosen line.
+          "ctrl+f" = ''launch --type=overlay --stdin-source=@screen_scrollback sh -c "${lib.getExe pkgs.fzf} --no-sort --no-mouse --exact -i --tac | kitty +kitten clipboard"'';
         }
         (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
           "cmd+shift+v" = "paste_from_clipboard";
@@ -144,20 +153,6 @@
           "cmd+shift+backspace" = "restore_font_size";
         })
       ];
-
-      # After stylix's theme, so that these tab colours win.
-      extraConfig = lib.mkAfter ''
-        tab_bar_style fade
-        bell_on_tab yes
-        tab_bar_edge bottom
-        tab_title_template {index}: {title}
-        active_tab_background #5f9373
-        active_tab_font_style bold-italic
-        inactive_tab_foreground #444
-        inactive_tab_background #999
-        inactive_tab_font_style bold
-        map ctrl+f launch --type=overlay --stdin-source=@screen_scrollback sh -c "${lib.getExe pkgs.fzf} --no-sort --no-mouse --exact -i --tac | kitty +kitten clipboard"
-      '';
     };
   };
 }

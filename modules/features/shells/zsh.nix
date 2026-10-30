@@ -11,7 +11,6 @@
   }: let
     inherit (pkgs.stdenv.hostPlatform) isDarwin;
     fzf = lib.getExe pkgs.fzf;
-    eza = lib.getExe pkgs.eza;
     plugin = name: src: file: {inherit name src file;};
   in {
     programs.zsh = {
@@ -64,26 +63,6 @@
           if isDarwin
           then "/Volumes"
           else "/run/media/$USER";
-      };
-
-      sessionVariables = {
-        LC_ALL = "en_US.UTF-8";
-        FZF_DEFAULT_OPTS = ''
-          --color bg+:#313244
-          --color bg:#1e1e2e
-          --color fg:#cdd6f4
-          --color fg+:#cdd6f4
-          --color hl:#f38ba8
-          --color hl+:#f38ba8
-          --color header:#f38ba8
-          --color spinner:#f5e0dc
-          --color info:#cba6f7
-          --color pointer:#f5e0dc
-          --color marker:#f5e0dc
-          --color prompt:#cba6f7
-          --prompt 'λ '
-          --pointer 'λ'
-        '';
       };
 
       completionInit = ''
@@ -182,11 +161,6 @@
           precmd() {
             printf '\033]0;%s\007' "$(dirs)"
           }
-
-          command_not_found_handler() {
-            printf 'Command not found ->\033[32;05;16m %s\033[0m \n' "$0" >&2
-            return 127
-          }
         ''
         # Completion colours from LS_COLORS, which vivid exports earlier in .zshrc.
         (lib.mkAfter "zstyle ':completion:*' list-colors \${(s.:.)LS_COLORS}")
@@ -203,9 +177,6 @@
         rm = "${pkgs.trash-cli}/bin/trash-put";
         m = "mkdir -p";
         fcd = ''cd "$(find . -type d | ${fzf})"'';
-        ls = "${eza} --icons --group-directories-first";
-        la = "${eza} -lah";
-        tree = "${eza} --tree --icons";
         http = "${lib.getExe pkgs.python3} -m http.server";
         ssh = "kitty +kitten ssh";
       };
