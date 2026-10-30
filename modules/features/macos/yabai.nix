@@ -69,11 +69,12 @@ in {
       '';
     };
 
+    # Full names, so that Homebrew trusts these two formulae and not the whole tap.
     homebrew = {
       taps = ["I-Want-ToBelieve/homebrew-formulae"];
       brews = [
-        "yakite"
-        "yakite-toast"
+        "I-Want-ToBelieve/formulae/yakite"
+        "I-Want-ToBelieve/formulae/yakite-toast"
       ];
     };
   };

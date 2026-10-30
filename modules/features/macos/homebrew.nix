@@ -1,6 +1,10 @@
 # Homebrew itself is installed by hand (https://brew.sh); nix-darwin declares what it installs.
 # Features that need a formula or cask add it to these lists themselves (see yabai, phoenix).
 # Tools that nixpkgs ships come from Nix instead.
+#
+# Homebrew refuses to load formulae from taps it does not trust, which aborts activation.
+# Formulae from third-party taps are therefore written in full (user/repo/formula): only
+# then does nix-darwin's `trusted: true` apply, to that formula alone.
 let
   # Homebrew mirrors in China.
   mirrors = {
@@ -32,7 +36,7 @@ in {
         "node"
         "fnm"
         "pnpm"
-        "icnsify"
+        "jackmordaunt/tap/icnsify"
         "oven-sh/bun/bun"
       ];
       casks = [
