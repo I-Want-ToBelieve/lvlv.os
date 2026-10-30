@@ -425,6 +425,7 @@ struct HintView: View {
       case .untrusted:
         Button("授予辅助功能权限后可显示菜单栏快捷键", action: openAccessibility)
           .buttonStyle(.link)
+          .foregroundStyle(Color.accentColor)
       case .ready:
         EmptyView()
       }
@@ -593,7 +594,7 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
       context.duration = 0.1
       panel.animator().alphaValue = 0
     } completionHandler: { [weak self] in
-      self?.panel.orderOut(nil)
+      MainActor.assumeIsolated { self?.panel.orderOut(nil) }
     }
   }
 

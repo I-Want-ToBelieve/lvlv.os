@@ -1,8 +1,15 @@
-# Tiling windows: yabai, keys from skhd, JankyBorders around windows and yakite layouts.
+# Tiling windows: yabai, its keys (through the shortcuts feature), JankyBorders around windows and yakite layouts.
 let
   yakite = "yakite action";
+  bind = key: description: command: {inherit key description command;};
+  hide = binding: binding // {hidden = true;};
+  # Space 10 sits on the 0 key.
+  digit = n:
+    if n == 10
+    then "0"
+    else toString n;
 in {
-  flake.modules.darwin.yabai = {
+  flake.modules.darwin.yabai = {lib, ...}: {
     services.yabai = {
       enable = true;
       enableScriptingAddition = true;
@@ -21,52 +28,50 @@ in {
       width = 12.0;
     };
 
-    services.skhd = {
-      enable = true;
-      skhdConfig = ''
-        ctrl - return : kitty --single-instance -d ~
-        cmd - backspace : skhd -k "alt - space"
-        ctrl - w : skhd -k "ctrl - up"
+    # Keys run through skhd; the shortcuts feature writes its config and the cheat sheet.
+    lvlv.shortcuts.groups = {
+      spaces = {
+        title = "空间";
+        order = 20;
+        bindings =
+          [
+            (bind "ctrl - 1…0" "切换到空间 1–10" null)
+            (bind "ctrl + shift - 1…0" "把窗口移到空间 1–10" null)
+            (bind "ctrl + shift - j" "把窗口移到上一个空间" "yabai -m window --space prev")
+            (bind "ctrl + shift - l" "把窗口移到下一个空间" "yabai -m window --space next")
+          ]
+          ++ lib.concatMap (n: [
+            (hide (bind "ctrl - ${digit n}" "切换到空间 ${toString n}" "yabai -m space --focus ${toString n}"))
+            (hide (bind "ctrl + shift - ${digit n}" "把窗口移到空间 ${toString n}" "yabai -m window --space ${toString n}"))
+          ]) (lib.range 1 10);
+      };
 
-        ctrl - 1 : yabai -m space --focus 1
-        ctrl - 2 : yabai -m space --focus 2
-        ctrl - 3 : yabai -m space --focus 3
-        ctrl - 4 : yabai -m space --focus 4
-        ctrl - 5 : yabai -m space --focus 5
-        ctrl - 6 : yabai -m space --focus 6
-        ctrl - 7 : yabai -m space --focus 7
-        ctrl - 8 : yabai -m space --focus 8
-        ctrl - 9 : yabai -m space --focus 9
-        ctrl - 0 : yabai -m space --focus 10
+      windows = {
+        title = "窗口";
+        order = 30;
+        bindings = [
+          (bind "ctrl - k" "聚焦下一个窗口" "${yakite} focus-next-window")
+          (bind "ctrl - i" "聚焦上一个窗口" "${yakite} focus-previous-window")
+          (bind "ctrl + shift - k" "窗口和下一个位置交换" "${yakite} move-active-window-to-next-position")
+          (bind "ctrl + shift - i" "窗口和上一个位置交换" "${yakite} move-active-window-to-previous-position")
+          (bind "ctrl + shift - m" "窗口移到主区域最前" "${yakite} push-active-window-into-master-area-front")
+          (bind "ctrl - f" "切换窗口浮动" "${yakite} toggle-active-window-floating")
+          (bind "ctrl - x" "最小化窗口" "yabai -m window --minimize")
+          (bind "ctrl - q" "关闭窗口" "yabai -m window --close")
+        ];
+      };
 
-        ctrl + shift - j : yabai -m window --space prev
-        ctrl + shift - l : yabai -m window --space next
-        ctrl + shift - 1 : yabai -m window --space 1
-        ctrl + shift - 2 : yabai -m window --space 2
-        ctrl + shift - 3 : yabai -m window --space 3
-        ctrl + shift - 4 : yabai -m window --space 4
-        ctrl + shift - 5 : yabai -m window --space 5
-        ctrl + shift - 6 : yabai -m window --space 6
-        ctrl + shift - 7 : yabai -m window --space 7
-        ctrl + shift - 8 : yabai -m window --space 8
-        ctrl + shift - 9 : yabai -m window --space 9
-        ctrl + shift - 0 : yabai -m window --space 10
-
-        ctrl - q : yabai -m window --close
-        ctrl - x : yabai -m window --minimize
-
-        ctrl - t : ${yakite} toggle-tile-layout
-        ctrl - m : ${yakite} toggle-monocle-layout
-        ctrl - f : ${yakite} toggle-active-window-floating
-        ctrl - k : ${yakite} focus-next-window
-        ctrl - i : ${yakite} focus-previous-window
-        ctrl + shift - k : ${yakite} move-active-window-to-next-position
-        ctrl + shift - i : ${yakite} move-active-window-to-previous-position
-        ctrl + shift - m : ${yakite} push-active-window-into-master-area-front
-        ctrl - 0x2A : ${yakite} switch-to-next-layout
-        ctrl - j : ${yakite} decrease-layout-master-area-size
-        ctrl - l : ${yakite} increase-layout-master-area-size
-      '';
+      layouts = {
+        title = "布局";
+        order = 40;
+        bindings = [
+          (bind "ctrl - t" "切换平铺布局" "${yakite} toggle-tile-layout")
+          (bind "ctrl - m" "切换单窗口布局" "${yakite} toggle-monocle-layout")
+          (bind "ctrl - 0x2A" "下一种布局" "${yakite} switch-to-next-layout")
+          (bind "ctrl - j" "缩小主区域" "${yakite} decrease-layout-master-area-size")
+          (bind "ctrl - l" "放大主区域" "${yakite} increase-layout-master-area-size")
+        ];
+      };
     };
 
     # Full names, so that Homebrew trusts these two formulae and not the whole tap.

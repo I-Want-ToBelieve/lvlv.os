@@ -8,6 +8,7 @@
     "macos-defaults"
     "macos-keyboard"
     "homebrew"
+    "shortcuts"
     "yabai"
     "phoenix"
     "proxychains"

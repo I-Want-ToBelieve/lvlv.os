@@ -4,7 +4,6 @@
   stdenv,
   swift,
   apple-sdk_26,
-  darwinMinVersionHook,
 }:
 stdenv.mkDerivation {
   pname = "keyhint";
@@ -12,14 +11,12 @@ stdenv.mkDerivation {
   src = ./keyhint;
 
   nativeBuildInputs = [swift];
-  buildInputs = [
-    apple-sdk_26
-    # SwiftUI's FocusState and NSHostingView sizing need macOS 14.
-    (darwinMinVersionHook "14.0")
-  ];
+  buildInputs = [apple-sdk_26];
 
   buildPhase = ''
     runHook preBuild
+    # The wrapped swiftc targets the SDK's own macOS version unless told otherwise;
+    # the app needs macOS 14 (SwiftUI FocusState) and nothing newer.
     swiftc -O -swift-version 5 -parse-as-library \
       -target ${stdenv.hostPlatform.darwinArch}-apple-macos14.0 \
       KeyHint.swift -o KeyHint
