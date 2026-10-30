@@ -4,11 +4,12 @@ let
     nix = {
       settings = {
         experimental-features = ["nix-command" "flakes"];
-        # Mirrors in China first, cache.nixos.org as the fallback.
+        # Look up registry names such as `nixpkgs` locally instead of fetching the global registry.
+        flake-registry = "/etc/nix/registry.json";
+        # Mirrors in China first; NixOS and nix-darwin append cache.nixos.org as the fallback.
         substituters = [
           "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
           "https://mirrors.ustc.edu.cn/nix-channels/store"
-          "https://cache.nixos.org/"
         ];
         # Prebuilt packages of nix-community projects (home-manager, nixvim, nix-index, ...).
         extra-substituters = ["https://nix-community.cachix.org"];
@@ -42,8 +43,6 @@ in {
       settings = {
         trusted-users = ["root" "@wheel"];
         allowed-users = ["@wheel"];
-        # Look up registry names such as `nixpkgs` locally instead of fetching the global registry.
-        flake-registry = "/etc/nix/registry.json";
       };
       gc.dates = "weekly";
     };

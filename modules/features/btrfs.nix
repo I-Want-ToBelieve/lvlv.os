@@ -2,12 +2,10 @@
 # copy can still repair them, and hourly snapshots of /home to restore deleted or
 # overwritten files from (`snapper -c home list`, files under /home/.snapshots/<n>/snapshot).
 {
-  flake.modules.nixos.btrfs = {lib, ...}: {
-    services.btrfs.autoScrub = {
-      enable = true;
-      # Every subvolume of a filesystem is scrubbed at once, so one mount point suffices.
-      fileSystems = lib.mkDefault ["/"];
-    };
+  flake.modules.nixos.btrfs = {
+    # Without a fileSystems list, NixOS scrubs one mount point per btrfs device, and that
+    # covers every subvolume on it.
+    services.btrfs.autoScrub.enable = true;
 
     services.snapper.configs.home = {
       SUBVOLUME = "/home";

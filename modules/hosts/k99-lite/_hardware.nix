@@ -65,7 +65,6 @@ in {
     };
   };
   swapDevices = [{device = "/dev/disk/by-label/swap";}];
-  services.btrfs.autoScrub.enable = true;
 
   # Windows on the same machine keeps the hardware clock in local time.
   time.hardwareClockInLocalTime = true;
