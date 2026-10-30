@@ -1,9 +1,7 @@
 # One colour scheme, wallpaper and set of fonts for the system and, through stylix's
 # Home Manager integration, for every user's programs (kitty takes its font and opacity here).
-{inputs, ...}: {
-  flake.modules.darwin.stylix = {pkgs, ...}: {
-    imports = [inputs.stylix.darwinModules.stylix];
-
+{inputs, ...}: let
+  theme = {pkgs, ...}: {
     stylix = {
       enable = true;
       image = pkgs.fetchurl {
@@ -33,6 +31,14 @@
       };
       opacity.terminal = 0.9;
     };
+  };
+in {
+  flake.modules.darwin.stylix = {
+    imports = [inputs.stylix.darwinModules.stylix theme];
+  };
+
+  flake.modules.nixos.stylix = {
+    imports = [inputs.stylix.nixosModules.stylix theme];
   };
 
   flake.modules.homeManager.stylix = {

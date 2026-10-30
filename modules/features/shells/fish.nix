@@ -1,9 +1,12 @@
-{
-  flake.modules.darwin.fish = {pkgs, ...}: {
+let
+  # The system side: /etc/fish loads the system environment, and fish may be a login shell.
+  system = {pkgs, ...}: {
     programs.fish.enable = true;
-    # nix-darwin puts a shell in /etc/shells only when it is listed here.
     environment.shells = [pkgs.fish];
   };
+in {
+  flake.modules.darwin.fish = system;
+  flake.modules.nixos.fish = system;
 
   flake.modules.homeManager.fish = {
     lib,
@@ -25,17 +28,29 @@
         ${lib.getExe pkgs.krabby} random
         echo -e "\033[37m\033[0m"
       '';
-      shellAliases.g = "git";
-      functions.c = {
-        description = "Open a path, or the current directory, in VS Code";
-        argumentNames = "path_string";
-        body = ''
-          if test -n "$path_string"
-            code $path_string
-          else
-            code .
-          end
-        '';
+      # Typed, these expand to the modern tool in place, so the command line shows what runs;
+      # pasted commands keep the standard tools and their flags.
+      shellAbbrs = {
+        cat = "bat --style=plain";
+        du = "dust";
+        ps = "procs";
+      };
+      functions = {
+        c = {
+          description = "Open a path, or the current directory, in VS Code";
+          argumentNames = "path_string";
+          body = ''
+            if test -n "$path_string"
+              code $path_string
+            else
+              code .
+            end
+          '';
+        };
+        fcd = {
+          description = "Pick a directory below this one with fzf and go there";
+          body = "cd (find . -type d | ${lib.getExe pkgs.fzf}); or return";
+        };
       };
     };
   };

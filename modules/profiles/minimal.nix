@@ -5,6 +5,7 @@
     "locale"
     "networking"
     "ssh-server"
+    "secrets"
     "zram"
   ];
 }

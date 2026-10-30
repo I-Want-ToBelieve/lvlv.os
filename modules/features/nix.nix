@@ -10,6 +10,11 @@ let
           "https://mirrors.ustc.edu.cn/nix-channels/store"
           "https://cache.nixos.org/"
         ];
+        # Prebuilt packages of nix-community projects (home-manager, nixvim, nix-index, ...).
+        extra-substituters = ["https://nix-community.cachix.org"];
+        extra-trusted-public-keys = ["nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="];
+        # The default 64 MiB fills up on large downloads and warns "download buffer is full".
+        download-buffer-size = 256 * 1024 * 1024;
         builders-use-substitutes = true;
         # Keep what direnv shells were built from across garbage collections.
         keep-outputs = true;

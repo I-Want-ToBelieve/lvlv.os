@@ -29,7 +29,13 @@ in {
     ...
   }: {
     devShells.default = pkgs.mkShellNoCC {
-      packages = [config.treefmt.build.wrapper];
+      packages = [
+        config.treefmt.build.wrapper
+        # Editing secrets (see the secrets feature).
+        pkgs.age
+        pkgs.sops
+        pkgs.ssh-to-age
+      ];
 
       shellHook = ''
         link_skills() {

@@ -110,17 +110,6 @@
 
           ZSH_AUTOSUGGEST_USE_ASYNC=true
 
-          function run() {
-            nix run nixpkgs#$@
-          }
-
-          function nix-search() {
-            nix search "''${@:-nixpkgs}" ".*" |
-              grep "^\* " | sed "s/^\* //;s/ (.*//" |
-              sed -r "s/\x1b\[([0-9]{1,2}(;[0-9]{1,2})?)?m//g" |
-              ${fzf} --preview="nix search nixpkgs '^{}$'"
-          }
-
           # Show the directory stack in the terminal title.
           precmd() {
             printf '\033]0;%s\007' "$(dirs)"
@@ -130,22 +119,8 @@
         (lib.mkAfter "zstyle ':completion:*' list-colors \${(s.:.)LS_COLORS}")
       ];
 
-      shellAliases = {
-        cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
-        bloat = "nix path-info -Sh /run/current-system";
-        ytmp3 = ''${lib.getExe pkgs.yt-dlp} -x --audio-format mp3 --audio-quality 0 --embed-metadata --embed-thumbnail --parse-metadata "title:%(artist)s - %(title)s" -o "%(title)s.%(ext)s"'';
-        cat = "${lib.getExe pkgs.bat} --style=plain";
-        grep = lib.getExe pkgs.ripgrep;
-        du = lib.getExe pkgs.dust;
-        ps = lib.getExe pkgs.procs;
-        rm = "${pkgs.trash-cli}/bin/trash-put";
-        m = "mkdir -p";
-        fcd = ''cd "$(find . -type d | ${fzf})"'';
-        # Not `http`, which is httpie's command.
-        serve = "${lib.getExe pkgs.python3} -m http.server";
-        # ouch picks the format from the file, so one command covers every archive.
-        extract = "${lib.getExe pkgs.ouch} decompress";
-      };
+      # The aliases every shell shares are in the shell-env feature.
+      shellAliases.fcd = ''cd "$(find . -type d | ${fzf})"'';
 
       # zsh-vi-mode otherwise sets its key bindings on the first prompt, after atuin's,
       # and takes Ctrl-R back.

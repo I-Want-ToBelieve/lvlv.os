@@ -56,6 +56,12 @@
         hide_window_decorations = "titlebar-only";
       };
 
+      # The mouse's side buttons switch tabs.
+      mouseBindings = {
+        "b4 press" = "ungrabbed,grabbed next_tab";
+        "b5 press" = "ungrabbed,grabbed previous_tab";
+      };
+
       keybindings = lib.mkMerge [
         # kitty's own ctrl+shift (kitty_mod) bindings already cover scrolling, windows, tabs,
         # layouts and font size; these are the ones that differ.
@@ -64,8 +70,6 @@
           "ctrl+c" = "copy_or_interrupt";
           "super+c" = "copy_or_interrupt";
           "ctrl+shift+v" = "paste_from_selection";
-          "mouse_button4" = "next_tab";
-          "mouse_button5" = "previous_tab";
           # Search the scrollback with fzf and copy the chosen line.
           "ctrl+f" = ''launch --type=overlay --stdin-source=@screen_scrollback sh -c "${lib.getExe pkgs.fzf} --no-sort --no-mouse --exact -i --tac | kitty +kitten clipboard"'';
         }

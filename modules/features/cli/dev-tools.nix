@@ -23,10 +23,11 @@
       pkgs.lazydocker
       pkgs.mitmproxy
       pkgs.watchexec
-      # Node.js
+      # JavaScript
       pkgs.nodejs
       pkgs.pnpm
       pkgs.fnm
+      pkgs.bun
       # Python
       pkgs.uv
       # Rust

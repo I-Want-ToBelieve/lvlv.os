@@ -8,7 +8,6 @@
     home.packages = [
       pkgs.bfg-repo-cleaner
       pkgs.colordiff
-      pkgs.gh
       pkgs.gist
       pkgs.git-absorb
       pkgs.git-filter-repo
@@ -79,6 +78,14 @@
           edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; \${EDITOR:-nvim} $(f)";
         };
       };
+    };
+
+    # GitHub CLI; git also takes its HTTPS credentials for github.com from gh.
+    programs.gh = {
+      enable = true;
+      settings.git_protocol = "ssh";
+      # `gh dash`: pull requests and issues across repositories in one view.
+      extensions = [pkgs.gh-dash];
     };
 
     programs.delta = {

@@ -19,21 +19,20 @@ in {
     homebrew = {
       enable = true;
       onActivation = {
-        autoUpdate = false;
+        # Fetch the formula index and upgrade what is installed, so that Homebrew's packages do
+        # not stay at the versions they were first installed with.
+        autoUpdate = true;
+        upgrade = true;
         # Uninstall, with their files, all formulae and casks not declared in this flake.
         cleanup = "zap";
         # darwin-rebuild runs brew through sudo, which does not pass the shell's variables on.
         extraEnv = mirrors;
       };
-      taps = [
-        "jackmordaunt/homebrew-tap"
-        "oven-sh/bun"
-      ];
+      taps = ["jackmordaunt/homebrew-tap"];
       brews = [
         # nixpkgs' curl does not work well on macOS.
         "curl"
         "jackmordaunt/tap/icnsify"
-        "oven-sh/bun/bun"
       ];
       casks = [
         "firefox"

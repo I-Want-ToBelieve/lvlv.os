@@ -1,0 +1,21 @@
+# Evaluate every host and check formatting and lints on each pull request and push to main.
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each runner evaluates the hosts of its own platform; building them would take hours.
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix flake check --no-build
+      - run: nix fmt -- --ci

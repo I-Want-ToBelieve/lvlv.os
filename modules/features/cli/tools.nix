@@ -18,6 +18,7 @@
       pkgs.openssl
       # Packs and unpacks every common archive format.
       pkgs.ouch
+      pkgs.procs
       pkgs.rclone
       pkgs.ripgrep
       pkgs.rsync
