@@ -47,11 +47,12 @@ Feature、Profile 和 `system` 的名字都是 enum。写错名字时求值会�
 | 从这台 Mac 经 SSH 部署 k99-lite（在目标机上构建） | `nix run .#activate -- k99-lite --target-host root@<地址> --build-host root@<地址>` |
 | 更新依赖 | `nix flake update`，然后跑上面的检查；CI 每周也会开一个更新 `flake.lock` 的 PR |
 
-`.github/workflows/check.yml` 在每次 push 和 PR 时，于 Linux 和 macOS 上各自求值本平台的主机并检查格式。
+`.github/workflows/check.yml` 在每次 push 和 PR 时，于 Linux、Apple Silicon macOS 和 Intel macOS 上各自求值本平台的主机并检查格式。
 
 ## 主机
 
 - `k99-lite-darwin` 和 `k99-lite` 是同一台机器（GRUB 引导 NixOS，或经 OpenCore 引导 macOS）。两边的用户都用 `cli` home profile，命令行环境一致；只有 macOS 有 `desktop`。
+- `k99lite-darwin-x64` 是 Intel Mac（`x86_64-darwin`）。nixpkgs 在 26.05 之后不再支持 x86_64-darwin，所以这个平台的 nixpkgs 和 nix-darwin 来自 `nixpkgs-x64` / `nix-darwin-x64` 两个输入（26.05 分支），按 system 的选择在 `modules/flake/systems.nix` 的 `lvlv.inputsFor`。Home Manager、stylix、nixvim 等仍用主线版本，主机文件里关掉了它们的版本检查，以及 26.05 上用不了的部分（nix-index 数据库、Nushell 集成），原因写在旁边。
 - 密钥用 sops-nix（`secrets` feature，在 `minimal` profile 里），主机用自己的 SSH host key 解密。加第一个密钥的步骤写在 `modules/features/secrets.nix` 的注释里，所需命令在 devShell 中。
 
 ## AI 知识：nix-skills

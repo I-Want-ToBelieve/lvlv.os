@@ -7,9 +7,11 @@
 
     programs.nixvim = {
       enable = true;
-      # The flake's nixpkgs, which nixvim's own input follows; set here because nixvim
-      # warns when that follows changes its default without being stated.
-      nixpkgs.source = inputs.nixpkgs;
+      # The nixpkgs the host is built from (unstable, or 26.05 on Intel Macs); set here
+      # because nixvim warns when its input's follows changes the default without being stated.
+      nixpkgs.source = pkgs.path;
+      # The host's own package set, with its nixpkgs.config, instead of a second instance.
+      nixpkgs.useGlobalPackages = true;
       # $EDITOR, also run as vi and vim.
       defaultEditor = true;
       viAlias = true;

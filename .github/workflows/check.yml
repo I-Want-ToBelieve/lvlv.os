@@ -12,7 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         # Each runner evaluates the hosts of its own platform; building them would take hours.
-        os: [ubuntu-latest, macos-latest]
+        # macos-15-intel is GitHub's x86_64-darwin runner.
+        os: [ubuntu-latest, macos-latest, macos-15-intel]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -21,7 +22,7 @@ jobs:
       # like) between runs.
       - uses: nix-community/cache-nix-action@v7
         with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-prefixes-first-match: nix-${{ runner.os }}-
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}-
       - run: nix flake check --no-build
       - run: nix fmt -- --ci

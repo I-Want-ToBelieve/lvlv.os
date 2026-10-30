@@ -95,16 +95,18 @@
     imports = [features.${class}.${name}];
   };
 
-  build = {
-    nixos = inputs.nixpkgs.lib.nixosSystem;
-    darwin = inputs.nix-darwin.lib.darwinSystem;
-  };
   homeManagerFor = {
     nixos = inputs.home-manager.nixosModules.home-manager;
     darwin = inputs.home-manager.darwinModules.home-manager;
   };
 
   mkHost = host: let
+    # Intel Macs are built from different nixpkgs and nix-darwin inputs (see systems.nix).
+    stack = cfg.inputsFor host.system;
+    build = {
+      nixos = stack.nixpkgs.lib.nixosSystem;
+      darwin = stack.nix-darwin.lib.darwinSystem;
+    };
     names = namesOf host.class host;
     # The homeManager part of a host's feature reaches every user of the host.
     sharedHome = map (useFeature "homeManager") (lib.filter (name: (features.homeManager or {}) ? ${name}) names);

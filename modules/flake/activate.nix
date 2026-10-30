@@ -13,7 +13,7 @@
 in {
   perSystem = {
     pkgs,
-    inputs',
+    system,
     ...
   }: {
     apps.activate = {
@@ -23,7 +23,10 @@ in {
         name = "activate";
         runtimeInputs =
           lib.optional (lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.nixos-rebuild-ng) pkgs.nixos-rebuild-ng
-          ++ lib.optional pkgs.stdenv.hostPlatform.isDarwin inputs'.nix-darwin.packages.darwin-rebuild;
+          # Built from this flake's pkgs rather than nix-darwin's own package set, which on
+          # Intel Macs would lack the nixpkgs.config that keeps 26.05 quiet.
+          ++ lib.optional pkgs.stdenv.hostPlatform.isDarwin
+          (pkgs.callPackage "${(config.lvlv.inputsFor system).nix-darwin}/pkgs/nix-tools" {}).darwin-rebuild;
         text = ''
           host=''${1:-$(hostname -s)}
           [ $# -gt 0 ] && shift

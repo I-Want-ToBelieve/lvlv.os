@@ -22,6 +22,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Intel Macs: nixpkgs dropped x86_64-darwin after 26.05, so those hosts stay on the
+    # last release that builds it, with the nix-darwin branch made for it.
+    nixpkgs-x64.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
+    nix-darwin-x64 = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
+      inputs.nixpkgs.follows = "nixpkgs-x64";
+    };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
