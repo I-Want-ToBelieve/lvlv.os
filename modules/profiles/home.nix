@@ -13,7 +13,6 @@
       "cli-tools"
       "dev-tools"
       "neovim"
-      "nushell"
     ];
     desktop = [
       "kitty"
