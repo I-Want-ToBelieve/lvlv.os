@@ -1,4 +1,4 @@
-# KeyHint.app, the cheat sheet overlay; its source is ./keyhint.
+# KeyHint.app: the shortcut cheat sheet and the system-changes panel; its source is ./keyhint.
 {
   lib,
   stdenv,
@@ -19,7 +19,7 @@ stdenv.mkDerivation {
     # the app needs macOS 14 (SwiftUI FocusState) and nothing newer.
     swiftc -O -swift-version 5 -parse-as-library \
       -target ${stdenv.hostPlatform.darwinArch}-apple-macos14.0 \
-      KeyHint.swift -o KeyHint
+      *.swift -o KeyHint
     runHook postBuild
   '';
 

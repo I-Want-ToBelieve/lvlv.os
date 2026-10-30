@@ -3,6 +3,8 @@
 // `KeyHint --config <file>` runs the agent; `KeyHint toggle` (bound in skhd) asks it to show or
 // hide. Bindings come from the JSON that Nix generates; with Accessibility permission the
 // frontmost app's menu bar shortcuts are added as well.
+//
+// `KeyHint changes <old> <new> <diff>` shows what a system switch changed (Changes.swift).
 
 import AppKit
 import ApplicationServices
@@ -451,6 +453,35 @@ final class HintPanel: NSPanel {
   override var canBecomeMain: Bool { false }
 }
 
+/// A borderless floating panel whose content view is the blurred, rounded background.
+@MainActor
+func makeOverlay(delegate: NSWindowDelegate) -> (HintPanel, NSVisualEffectView) {
+  let panel = HintPanel(
+    contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+    styleMask: [.borderless, .nonactivatingPanel],
+    backing: .buffered,
+    defer: false)
+  panel.isOpaque = false
+  panel.backgroundColor = .clear
+  panel.hasShadow = true
+  panel.level = .floating
+  panel.hidesOnDeactivate = false
+  panel.isMovableByWindowBackground = false
+  panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
+  panel.delegate = delegate
+
+  let blur = NSVisualEffectView()
+  blur.material = .hudWindow
+  blur.blendingMode = .behindWindow
+  blur.state = .active
+  blur.wantsLayer = true
+  blur.layer?.cornerRadius = 18
+  blur.layer?.cornerCurve = .continuous
+  blur.layer?.masksToBounds = true
+  panel.contentView = blur
+  return (panel, blur)
+}
+
 @MainActor
 final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
   let configPath: String?
@@ -466,33 +497,10 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
   }
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    let panel = HintPanel(
-      contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
-      styleMask: [.borderless, .nonactivatingPanel],
-      backing: .buffered,
-      defer: false)
-    panel.isOpaque = false
-    panel.backgroundColor = .clear
-    panel.hasShadow = true
-    panel.level = .floating
-    panel.hidesOnDeactivate = false
-    panel.isMovableByWindowBackground = false
-    panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
-    panel.delegate = self
-
-    let blur = NSVisualEffectView()
-    blur.material = .hudWindow
-    blur.blendingMode = .behindWindow
-    blur.state = .active
-    blur.wantsLayer = true
-    blur.layer?.cornerRadius = 18
-    blur.layer?.cornerCurve = .continuous
-    blur.layer?.masksToBounds = true
-
+    let (panel, blur) = makeOverlay(delegate: self)
     hosting = NSHostingView(rootView: HintView(model: model) { [weak self] in self?.openAccessibility() })
     hosting.autoresizingMask = [.width, .height]
     blur.addSubview(hosting)
-    panel.contentView = blur
     self.panel = panel
 
     DistributedNotificationCenter.default().addObserver(
@@ -614,6 +622,10 @@ final class Controller: NSObject, NSApplicationDelegate, NSWindowDelegate {
 enum Main {
   static func main() {
     let args = CommandLine.arguments
+    if args.count > 4, args[1] == "changes" {
+      ChangesController.run(old: args[2], new: args[3], diffFile: args[4])
+      return
+    }
     if args.count > 1, args[1] == "toggle" {
       DistributedNotificationCenter.default().postNotificationName(
         toggleNotification, object: nil, userInfo: nil, deliverImmediately: true)

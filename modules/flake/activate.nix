@@ -35,7 +35,17 @@ in {
               ;;
           esac
           case "$class" in
-            darwin) exec sudo darwin-rebuild switch --flake "${self}#$host" "$@" ;;
+            darwin)
+              old=$(readlink -f /run/current-system)
+              sudo darwin-rebuild switch --flake "${self}#$host" "$@"
+              new=$(readlink -f /run/current-system)
+              # The shortcuts feature's KeyHint shows what the switch changed, where installed.
+              if [ "$old" != "$new" ] && command -v keyhint >/dev/null; then
+                diff=$(mktemp)
+                nix store diff-closures "$old" "$new" >"$diff" 2>/dev/null || true
+                nohup keyhint changes "$old" "$new" "$diff" >/dev/null 2>&1 &
+              fi
+              ;;
             nixos) exec nixos-rebuild switch --flake "${self}#$host" --sudo "$@" ;;
           esac
         '';
