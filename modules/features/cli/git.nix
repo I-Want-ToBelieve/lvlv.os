@@ -26,8 +26,25 @@
           email = "yuzhiyong@zhaojiafang.com";
         };
         init.defaultBranch = "main";
-        diff.colorMoved = "default";
-        merge.conflictstyle = "diff3";
+        diff = {
+          colorMoved = "default";
+          algorithm = "histogram";
+        };
+        # diff3 without the lines both sides already agree on.
+        merge.conflictstyle = "zdiff3";
+        # The first push of a new branch sets its upstream.
+        push.autoSetupRemote = true;
+        fetch.prune = true;
+        rebase = {
+          autoStash = true;
+          # Moves `fixup!` commits (git absorb makes them) next to their targets.
+          autoSquash = true;
+        };
+        # Remember how a conflict was resolved and resolve it the same way next time.
+        rerere.enabled = true;
+        branch.sort = "-committerdate";
+        # The diff under the message being written.
+        commit.verbose = true;
         alias = {
           a = "add -p";
           c = "commit";

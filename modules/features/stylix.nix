@@ -15,15 +15,16 @@
       fonts = {
         serif = {
           package = pkgs.noto-fonts;
-          name = "Noto Sans Mono";
+          name = "Noto Serif";
         };
         sansSerif = {
           package = pkgs.lxgw-wenkai;
           name = "LXGW WenKai Mono";
         };
+        # CJK glyphs and Nerd Font icons in one monospace font.
         monospace = {
-          package = pkgs.nerd-fonts.inconsolata;
-          name = "Inconsolata Nerd Font Mono";
+          package = pkgs.maple-mono.NF-CN;
+          name = "Maple Mono NF CN";
         };
         emoji = {
           package = pkgs.noto-fonts-color-emoji;

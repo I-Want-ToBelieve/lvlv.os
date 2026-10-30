@@ -50,7 +50,8 @@
         AppleInterfaceStyle = "Dark";
         # Full keyboard access to every control.
         AppleKeyboardUIMode = 3;
-        ApplePressAndHoldEnabled = true;
+        # Holding a key repeats it (hjkl in vim) instead of offering accented letters.
+        ApplePressAndHoldEnabled = false;
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;
         AppleShowScrollBars = "Automatic";

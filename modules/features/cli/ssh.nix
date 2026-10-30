@@ -1,5 +1,9 @@
 {
   flake.modules.homeManager.ssh = {
+    lib,
+    pkgs,
+    ...
+  }: {
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
@@ -17,7 +21,21 @@
             Port = 443;
           };
       in {
-        "*".StrictHostKeyChecking = "accept-new";
+        "*" =
+          {
+            StrictHostKeyChecking = "accept-new";
+            # A key's passphrase is asked for once per login session, not on every connection.
+            AddKeysToAgent = "yes";
+            # Keep idle connections through NAT and notice dead ones within three minutes.
+            ServerAliveInterval = 60;
+            ServerAliveCountMax = 3;
+            # Later connections to the same host reuse the first one's TCP connection.
+            ControlMaster = "auto";
+            ControlPath = "~/.ssh/control-%C";
+            ControlPersist = "10m";
+          }
+          # Passphrases kept in the macOS Keychain; Linux's OpenSSH rejects this option.
+          // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {UseKeychain = "yes";};
         # GitLab running on this machine.
         "127.0.0.1" = withKey "id_rsa_gitlab_localhost" // {Port = 10022;};
         "gitlab.com" = withKey "id_rsa_gitlab";

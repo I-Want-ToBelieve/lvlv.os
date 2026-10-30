@@ -32,10 +32,6 @@ in {
       brews = [
         # nixpkgs' curl does not work well on macOS.
         "curl"
-        "rust"
-        "node"
-        "fnm"
-        "pnpm"
         "jackmordaunt/tap/icnsify"
         "oven-sh/bun/bun"
       ];
