@@ -59,31 +59,33 @@
         treesitter = {
           enable = true;
           # The languages in use here, not all few hundred grammars.
-          grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
-            bash
-            c
-            css
-            diff
-            dockerfile
-            fish
-            gitcommit
-            html
-            javascript
-            json
-            lua
-            markdown
-            markdown_inline
-            nix
-            python
-            query
-            regex
-            rust
-            toml
-            tsx
-            typescript
-            vim
-            vimdoc
-            yaml
+          grammarPackages = let
+            g = pkgs.vimPlugins.nvim-treesitter.builtGrammars;
+          in [
+            g.bash
+            g.c
+            g.css
+            g.diff
+            g.dockerfile
+            g.fish
+            g.gitcommit
+            g.html
+            g.javascript
+            g.json
+            g.lua
+            g.markdown
+            g.markdown_inline
+            g.nix
+            g.python
+            g.query
+            g.regex
+            g.rust
+            g.toml
+            g.tsx
+            g.typescript
+            g.vim
+            g.vimdoc
+            g.yaml
           ];
           settings = {
             highlight.enable = true;

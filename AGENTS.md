@@ -40,11 +40,19 @@ Feature、Profile 和 `system` 的名字都是 enum。写错名字时求值会�
 | 做什么 | 命令 |
 | --- | --- |
 | 两个平台全部求值，不构建 | `nix flake check --all-systems --no-build` |
-| 构建本平台的主机并检查格式 | `nix flake check` |
-| 格式化 | `nix fmt` |
+| 构建本平台的主机并检查格式和 lint | `nix flake check` |
+| 格式化，并应用 statix / deadnix 的修复 | `nix fmt` |
 | 切换本机 | `nix run .#activate` |
+| 切换本机，先显示包的变化 | `nh darwin switch .` / `nh os switch .` |
 | 从这台 Mac 经 SSH 部署 k99-lite（在目标机上构建） | `nix run .#activate -- k99-lite --target-host root@<地址> --build-host root@<地址>` |
-| 更新依赖 | `nix flake update`，然后跑上面的检查 |
+| 更新依赖 | `nix flake update`，然后跑上面的检查；CI 每周也会开一个更新 `flake.lock` 的 PR |
+
+`.github/workflows/check.yml` 在每次 push 和 PR 时，于 Linux 和 macOS 上各自求值本平台的主机并检查格式。
+
+## 主机
+
+- `k99-lite-darwin` 和 `k99-lite` 是同一台机器（GRUB 引导 NixOS，或经 OpenCore 引导 macOS）。两边的用户都用 `cli` home profile，命令行环境一致；只有 macOS 有 `desktop`。
+- 密钥用 sops-nix（`secrets` feature，在 `minimal` profile 里），主机用自己的 SSH host key 解密。加第一个密钥的步骤写在 `modules/features/secrets.nix` 的注释里，所需命令在 devShell 中。
 
 ## AI 知识：nix-skills
 

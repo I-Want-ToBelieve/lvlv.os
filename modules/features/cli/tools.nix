@@ -45,14 +45,13 @@
         git = true;
         extraOptions = ["--group-directories-first"];
       };
-      # Colours come from stylix. The key bindings stay off so that Ctrl-R remains atuin's.
+      # Colours come from stylix. Ctrl-T picks a file and Alt-C a directory to go to;
+      # Ctrl-R stays atuin's.
       fzf = {
         enable = true;
-        enableBashIntegration = false;
-        enableZshIntegration = false;
-        enableFishIntegration = false;
-        enableNushellIntegration = false;
         defaultOptions = ["--prompt 'λ '" "--pointer 'λ'"];
+        fileWidget.options = ["--preview 'bat --color=always --style=plain {}'"];
+        historyWidget.command = "";
       };
       # `tldr <command>`: short examples.
       tealdeer = {
@@ -67,7 +66,12 @@
         shellWrapperName = "ra";
       };
       zellij.enable = true;
-      zoxide.enable = true;
+      # `cd` itself learns the directories visited and jumps to them by part of the name;
+      # `cdi` picks one interactively.
+      zoxide = {
+        enable = true;
+        options = ["--cmd" "cd"];
+      };
     };
   };
 }

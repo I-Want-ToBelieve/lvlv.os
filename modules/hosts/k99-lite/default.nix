@@ -7,7 +7,7 @@ in {
     # The release k99-lite was installed with; never change it.
     stateVersion = "24.05";
     profiles = ["minimal"];
-    features = ["root" "i-want-to-believe" "fish" "stylix"];
+    features = ["root" "i-want-to-believe" "fish" "stylix" "btrfs" "firmware"];
     modules = [
       inputs.nixos-hardware.nixosModules.common-cpu-intel-cpu-only
       inputs.nixos-hardware.nixosModules.common-pc-ssd

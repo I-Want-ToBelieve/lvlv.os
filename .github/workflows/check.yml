@@ -17,5 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
+      # Keeps the store paths that evaluation fetches (stylix's base16 schemes and the
+      # like) between runs.
+      - uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
       - run: nix flake check --no-build
       - run: nix fmt -- --ci

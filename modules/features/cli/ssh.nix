@@ -46,5 +46,28 @@
         "001macos".HostName = "192.168.192.140";
       };
     };
+
+    # kitty sets TERM=xterm-kitty, which most servers have no terminfo for. Inside kitty,
+    # `kitten ssh` copies the terminfo over first; everywhere else ssh runs as it is.
+    programs.fish.functions.ssh = {
+      description = "ssh, through kitten ssh inside kitty";
+      wraps = "ssh";
+      body = ''
+        if test "$TERM" = xterm-kitty; and type -q kitten
+          kitten ssh $argv
+        else
+          command ssh $argv
+        end
+      '';
+    };
+    programs.zsh.initContent = ''
+      ssh() {
+        if [[ $TERM == xterm-kitty ]] && (( $+commands[kitten] )); then
+          kitten ssh "$@"
+        else
+          command ssh "$@"
+        fi
+      }
+    '';
   };
 }

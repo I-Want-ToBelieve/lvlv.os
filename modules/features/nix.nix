@@ -19,9 +19,10 @@ let
         # Keep what direnv shells were built from across garbage collections.
         keep-outputs = true;
         keep-derivations = true;
-        # Collect garbage during a build once less than 100 MiB is free, until 1 GiB is.
-        min-free = 100 * 1024 * 1024;
-        max-free = 1024 * 1024 * 1024;
+        # Collect garbage during a build once less than 5 GiB is free, until 20 GiB is: with
+        # outputs and derivations kept, a large build can otherwise fill the disk first.
+        min-free = 5 * 1024 * 1024 * 1024;
+        max-free = 20 * 1024 * 1024 * 1024;
         warn-dirty = false;
       };
       gc = {
