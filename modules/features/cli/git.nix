@@ -25,6 +25,9 @@
           email = "yuzhiyong@zhaojiafang.com";
         };
         init.defaultBranch = "main";
+        # Carried over from the hand-written ~/.gitconfig: repositories owned by another user
+        # (external drives, the other OS's partitions) are used without listing each one.
+        safe.directory = "*";
         diff = {
           colorMoved = "default";
           algorithm = "histogram";
