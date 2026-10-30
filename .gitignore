@@ -1,0 +1,8 @@
+result
+result-*
+.direnv/
+.DS_Store
+
+# Linked from nix-skills by the dev shell; they point into /nix/store.
+.claude/skills/
+.agents/skills/
