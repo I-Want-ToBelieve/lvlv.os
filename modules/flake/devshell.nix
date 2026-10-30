@@ -38,8 +38,9 @@ in {
       ];
 
       shellHook = ''
-        # sops looks under ~/Library/Application Support on macOS; one place on both systems.
-        export SOPS_AGE_KEY_FILE=''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}
+        # The age key, encrypted with a passphrase that sops asks for on each use; the same
+        # path on both systems (sops' default is under ~/Library/Application Support on macOS).
+        export SOPS_AGE_KEY_FILE=''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.age}
 
         link_skills() {
           local dir=$1 link target name
