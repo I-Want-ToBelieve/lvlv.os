@@ -14,9 +14,6 @@
     eza = lib.getExe pkgs.eza;
     plugin = name: src: file: {inherit name src file;};
   in {
-    # zsh sets its own LS_COLORS below; keep dircolors from replacing it.
-    programs.dircolors.enableZshIntegration = false;
-
     programs.zsh = {
       enable = true;
       autosuggestion.enable = true;
@@ -71,7 +68,6 @@
 
       sessionVariables = {
         LC_ALL = "en_US.UTF-8";
-        LS_COLORS = lib.fileContents ./ls-colors;
         FZF_DEFAULT_OPTS = ''
           --color bg+:#313244
           --color bg:#1e1e2e
@@ -95,103 +91,106 @@
         _comp_options+=(globdots)
       '';
 
-      initContent = ''
-        export SUDO_PROMPT=$'Password for ->\033[32;05;16m %u\033[0m  '
+      initContent = lib.mkMerge [
+        ''
+          export SUDO_PROMPT=$'Password for ->\033[32;05;16m %u\033[0m  '
 
-        zmodload zsh/zle
-        zmodload zsh/zpty
-        zmodload zsh/complist
-        autoload -Uz colors && colors
+          zmodload zsh/zle
+          zmodload zsh/zpty
+          zmodload zsh/complist
+          autoload -Uz colors && colors
 
-        # Completion: grouped and described matches, case-insensitive and then partial-word
-        # matching, one typo forgiven, LS_COLORS colours.
-        zstyle ':completion:*' sort false
-        zstyle ':completion:complete:*:options' sort false
-        zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
-        zstyle ':completion:*' special-dirs true
-        zstyle ':completion:*' rehash true
-        zstyle ':completion:*' menu yes select
-        zstyle ':completion:*' list-grouped false
-        zstyle ':completion:*' list-separator '''
-        zstyle ':completion:*' group-name '''
-        zstyle ':completion:*' verbose yes
-        zstyle ':completion:*:matches' group 'yes'
-        zstyle ':completion:*:warnings' format '%F{red}%B-- No match for: %d --%b%f'
-        zstyle ':completion:*:messages' format '%d'
-        zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
-        zstyle ':completion:*:descriptions' format '[%d]'
-        zstyle ':completion:*' completer _complete _match _approximate
-        zstyle ':completion:*:match:*' original only
-        zstyle ':completion:*:approximate:*' max-errors 1 numeric
-        zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
-        zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
-        zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-        zstyle ':completion:*:jobs' numbers true
-        zstyle ':completion:*:jobs' verbose true
-        zstyle ':completion:*:git-checkout:*' sort false
-        zstyle ':completion:*' file-sort modification
-        zstyle ':completion:*:eza' sort false
-        zstyle ':completion:files' sort false
+          # Completion: grouped and described matches, case-insensitive and then partial-word
+          # matching, one typo forgiven.
+          zstyle ':completion:*' sort false
+          zstyle ':completion:complete:*:options' sort false
+          zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
+          zstyle ':completion:*' special-dirs true
+          zstyle ':completion:*' rehash true
+          zstyle ':completion:*' menu yes select
+          zstyle ':completion:*' list-grouped false
+          zstyle ':completion:*' list-separator '''
+          zstyle ':completion:*' group-name '''
+          zstyle ':completion:*' verbose yes
+          zstyle ':completion:*:matches' group 'yes'
+          zstyle ':completion:*:warnings' format '%F{red}%B-- No match for: %d --%b%f'
+          zstyle ':completion:*:messages' format '%d'
+          zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+          zstyle ':completion:*:descriptions' format '[%d]'
+          zstyle ':completion:*' completer _complete _match _approximate
+          zstyle ':completion:*:match:*' original only
+          zstyle ':completion:*:approximate:*' max-errors 1 numeric
+          zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
+          zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+          zstyle ':completion:*:jobs' numbers true
+          zstyle ':completion:*:jobs' verbose true
+          zstyle ':completion:*:git-checkout:*' sort false
+          zstyle ':completion:*' file-sort modification
+          zstyle ':completion:*:eza' sort false
+          zstyle ':completion:files' sort false
 
-        ZSH_AUTOSUGGEST_USE_ASYNC=true
+          ZSH_AUTOSUGGEST_USE_ASYNC=true
 
-        function run() {
-          nix run nixpkgs#$@
-        }
+          function run() {
+            nix run nixpkgs#$@
+          }
 
-        function nix-search() {
-          nix search "''${@:-nixpkgs}" ".*" |
-            grep "^\* " | sed "s/^\* //;s/ (.*//" |
-            sed -r "s/\x1b\[([0-9]{1,2}(;[0-9]{1,2})?)?m//g" |
-            ${fzf} --preview="nix search nixpkgs '^{}$'"
-        }
+          function nix-search() {
+            nix search "''${@:-nixpkgs}" ".*" |
+              grep "^\* " | sed "s/^\* //;s/ (.*//" |
+              sed -r "s/\x1b\[([0-9]{1,2}(;[0-9]{1,2})?)?m//g" |
+              ${fzf} --preview="nix search nixpkgs '^{}$'"
+          }
 
-        function extract() {
-          if [ -z "$1" ]; then
-            echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz|.zlib|.cso>"
-            echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
-            return 1
-          fi
-          for n in "$@"; do
-            if [ ! -f "$n" ]; then
-              echo "'$n' - file doesn't exist"
+          function extract() {
+            if [ -z "$1" ]; then
+              echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz|.zlib|.cso>"
+              echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
               return 1
             fi
-            case "''${n%,}" in
-              *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar) tar xvf "$n" ;;
-              *.lzma) unlzma ./"$n" ;;
-              *.bz2) bunzip2 ./"$n" ;;
-              *.cbr|*.rar) unrar x -ad ./"$n" ;;
-              *.gz) gunzip ./"$n" ;;
-              *.cbz|*.epub|*.zip) unzip ./"$n" ;;
-              *.z) uncompress ./"$n" ;;
-              *.7z|*.apk|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar) 7z x ./"$n" ;;
-              *.xz) unxz ./"$n" ;;
-              *.exe) cabextract ./"$n" ;;
-              *.cpio) cpio -id < ./"$n" ;;
-              *.cba|*.ace) unace x ./"$n" ;;
-              *.zpaq) zpaq x ./"$n" ;;
-              *.arc) arc e ./"$n" ;;
-              *.cso) ciso 0 ./"$n" ./"$n.iso" && extract "$n.iso" && \rm -f "$n" ;;
-              *.zlib) zlib-flate -uncompress < ./"$n" > ./"$n.tmp" && mv ./"$n.tmp" ./"''${n%.*zlib}" && rm -f "$n" ;;
-              *)
-                echo "extract: '$n' - unknown archive method"
+            for n in "$@"; do
+              if [ ! -f "$n" ]; then
+                echo "'$n' - file doesn't exist"
                 return 1
-                ;;
-            esac
-          done
-        }
+              fi
+              case "''${n%,}" in
+                *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar) tar xvf "$n" ;;
+                *.lzma) unlzma ./"$n" ;;
+                *.bz2) bunzip2 ./"$n" ;;
+                *.cbr|*.rar) unrar x -ad ./"$n" ;;
+                *.gz) gunzip ./"$n" ;;
+                *.cbz|*.epub|*.zip) unzip ./"$n" ;;
+                *.z) uncompress ./"$n" ;;
+                *.7z|*.apk|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar) 7z x ./"$n" ;;
+                *.xz) unxz ./"$n" ;;
+                *.exe) cabextract ./"$n" ;;
+                *.cpio) cpio -id < ./"$n" ;;
+                *.cba|*.ace) unace x ./"$n" ;;
+                *.zpaq) zpaq x ./"$n" ;;
+                *.arc) arc e ./"$n" ;;
+                *.cso) ciso 0 ./"$n" ./"$n.iso" && extract "$n.iso" && \rm -f "$n" ;;
+                *.zlib) zlib-flate -uncompress < ./"$n" > ./"$n.tmp" && mv ./"$n.tmp" ./"''${n%.*zlib}" && rm -f "$n" ;;
+                *)
+                  echo "extract: '$n' - unknown archive method"
+                  return 1
+                  ;;
+              esac
+            done
+          }
 
-        # Show the directory stack in the terminal title.
-        precmd() {
-          printf '\033]0;%s\007' "$(dirs)"
-        }
+          # Show the directory stack in the terminal title.
+          precmd() {
+            printf '\033]0;%s\007' "$(dirs)"
+          }
 
-        command_not_found_handler() {
-          printf 'Command not found ->\033[32;05;16m %s\033[0m \n' "$0" >&2
-          return 127
-        }
-      '';
+          command_not_found_handler() {
+            printf 'Command not found ->\033[32;05;16m %s\033[0m \n' "$0" >&2
+            return 127
+          }
+        ''
+        # Completion colours from LS_COLORS, which vivid exports earlier in .zshrc.
+        (lib.mkAfter "zstyle ':completion:*' list-colors \${(s.:.)LS_COLORS}")
+      ];
 
       shellAliases = {
         cleanup = "sudo nix-collect-garbage --delete-older-than 7d";

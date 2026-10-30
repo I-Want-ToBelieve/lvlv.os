@@ -24,9 +24,10 @@
 
     programs = {
       bat.enable = true;
-      dircolors.enable = true;
       eza.enable = true;
       mcfly.enable = true;
+      # LS_COLORS for every shell, generated from the stylix colour scheme.
+      vivid.enable = true;
       zellij.enable = true;
       zoxide.enable = true;
     };
