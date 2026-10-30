@@ -129,7 +129,6 @@
       localVariables.ZVM_INIT_MODE = "sourcing";
 
       plugins = [
-        (plugin "zsh-nix-shell" pkgs.zsh-nix-shell "share/zsh/plugins/zsh-nix-shell/nix-shell.plugin.zsh")
         (plugin "zsh-vi-mode" pkgs.zsh-vi-mode "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh")
         (plugin "fast-syntax-highlighting" pkgs.zsh-fast-syntax-highlighting "share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh")
         (plugin "zsh-autopair" pkgs.zsh-autopair "share/zsh/zsh-autopair/autopair.zsh")

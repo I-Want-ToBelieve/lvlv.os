@@ -127,5 +127,17 @@
         );
       };
     };
+
+    # Enabled here rather than listed as a package so that stylix themes it.
+    programs.lazygit = {
+      enable = true;
+      # Diffs drawn by delta as in `git diff`; delta reads the options above from the git config.
+      settings.git.pagers = [
+        {
+          colorArg = "always";
+          pager = "${lib.getExe config.programs.delta.package} --paging=never";
+        }
+      ];
+    };
   };
 }

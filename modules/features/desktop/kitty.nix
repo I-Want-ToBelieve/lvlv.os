@@ -37,6 +37,9 @@
         # Bell
         visual_bell_duration = "0.0";
         enable_audio_bell = "no";
+        # A notification when a command of 10 s or more finishes out of sight. It works in any
+        # shell with kitty's shell integration, which kitten ssh also sets up on servers.
+        notify_on_cmd_finish = "invisible 10.0";
         # Scrollback
         scrollback_lines = "10000";
         wheel_scroll_multiplier = "5.0";

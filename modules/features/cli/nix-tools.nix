@@ -42,5 +42,12 @@
     # `nh darwin switch .` / `nh os switch .` build with nom and show the nvd diff before
     # switching. Garbage collection stays with nix.gc.
     programs.nh.enable = true;
+
+    # `nix develop`, `nix shell` and `nix-shell` start the shell they were typed in rather than
+    # bash, and they and `nix build` show their build progress through nom.
+    programs.nix-your-shell = {
+      enable = true;
+      nix-output-monitor.enable = true;
+    };
   };
 }

@@ -23,6 +23,9 @@ in {
         set fish_cursor_insert line
         set fish_cursor_replace_one underscore
         set fish_cursor_visual block
+        # autopair binds its keys when fish_key_bindings changes, but fish_vi_key_bindings sets
+        # it without that event (set --no-event), so the insert-mode keys are bound here.
+        _autopair_fish_key_bindings
 
         ${lib.getExe pkgs.krabby} random
         echo -e "\033[37m\033[0m"
@@ -51,6 +54,13 @@ in {
           body = "cd (find . -type d | ${lib.getExe pkgs.fzf}); or return";
         };
       };
+      # Brackets and quotes typed in pairs, as zsh-autopair does in zsh.
+      plugins = [
+        {
+          name = "autopair";
+          inherit (pkgs.fishPlugins.autopair) src;
+        }
+      ];
     };
   };
 }
