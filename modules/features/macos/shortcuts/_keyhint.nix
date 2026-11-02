@@ -3,15 +3,17 @@
   lib,
   stdenv,
   swift,
-  apple-sdk_26,
 }:
 stdenv.mkDerivation {
   pname = "keyhint";
   version = "0.1.0";
   src = ./keyhint;
 
+  # No SDK of our own: swift brings the one its compiler shipped with, macOS 26 for Swift 6
+  # and macOS 14 for the Swift 5.10 of nixpkgs 26.05 (Intel Macs). Given the macOS 26 SDK,
+  # Swift 5.10 hits an import cycle among AppKit, SwiftUICore and SwiftUI in its interfaces,
+  # waits minutes on module locks it holds itself and then builds those modules again.
   nativeBuildInputs = [swift];
-  buildInputs = [apple-sdk_26];
 
   buildPhase = ''
     runHook preBuild
