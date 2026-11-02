@@ -24,5 +24,15 @@ jobs:
         with:
           primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}-
+      # `nix flake check --no-build` evaluates read-only, so it cannot fetch the store paths that
+      # evaluation reads, such as the base16 scheme stylix takes from base16-schemes. A plain
+      # evaluation of what it checks (this platform's checks and every NixOS host) fetches them
+      # first, without building any host.
+      - name: Fetch the store paths that evaluation reads
+        run: |
+          system=$(nix config show system)
+          nix eval ".#checks.$system" --apply 'builtins.mapAttrs (_: check: check.drvPath)'
+          nix eval .#nixosConfigurations \
+            --apply 'builtins.mapAttrs (_: host: host.config.system.build.toplevel.drvPath)'
       - run: nix flake check --no-build
       - run: nix fmt -- --ci
